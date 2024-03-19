@@ -100,7 +100,13 @@ pipeline {
                 }
             }
         }
-
+       stage('Test staging') {
+           agent any
+           steps {
+              script {
+                    sh 'curl http://34.230.0.167:${PORT_EXPOSED} | grep -q "Hello world!"'
+              }
+           }
         stage ('Deploy in prod') {
             agent any
             when {
@@ -127,6 +133,13 @@ pipeline {
                     '''
                 }
             }
+       stage('Test production') {
+           agent any
+           steps {
+              script {
+                    sh 'curl http://3.80.175.207:${PORT_EXPOSED} | grep -q "Hello world!"'
+              }
+           }
         }
 
     }
