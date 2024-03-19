@@ -107,6 +107,7 @@ pipeline {
                     sh 'curl http://34.230.0.167:${PORT_EXPOSED} | grep -q "Hello world!"'
               }
            }
+       }
         stage ('Deploy in prod') {
             agent any
             when {
