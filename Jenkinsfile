@@ -18,6 +18,7 @@ pipeline {
         }
 
         stage ('Run container based on builded image') {
+            agent any
             steps {
                 script {
                     sh '''
@@ -43,7 +44,7 @@ pipeline {
             agent any
             steps {
                 script {
-                    sh 'curl http://172.17.0.1:${PORT_EXPOSED} | grep -q "Hello world!"'
+                    sh 'curl http://172.17.0.1:${PORT_EXPOSED} | grep -q "Hello world Lewis!"'
                 }
             }
         }
@@ -78,7 +79,7 @@ pipeline {
                 expression { GIT_BRANCH == 'origin/master' }
             }
             environment {
-                HOSTNAME_DEPLOY_STAGING = "34.230.0.167"
+                HOSTNAME_DEPLOY_STAGING = "3.85.145.3"
             }
             steps {
                 sshagent(credentials : ['SSH_AUTH_SERVER']) {
@@ -106,7 +107,7 @@ pipeline {
                 expression { GIT_BRANCH == 'origin/master' }
             }
             environment {
-                HOSTNAME_DEPLOY_PROD = "3.80.175.207"
+                HOSTNAME_DEPLOY_PROD = "3.81.41.209"
             }
             steps {
                 sshagent(credentials : ['SSH_AUTH_SERVER']) {
