@@ -2,9 +2,11 @@ pipeline {
     agent none
 
     environment {
-        DOCKERHUB_AUTH = credentials('9cefdfca-96f9-4db0-8590-319f70870737')
+        DOCKERHUB_AUTH = credentials('DOCKERHUB_AUTH')
         ID_DOCKER = "${DOCKERHUB_AUTH_USR}"
         PORT_EXPOSED = "80"
+        HOSTNAME_DEPLOY_STAGING = "34.230.0.167"
+        HOSTNAME_DEPLOY_PROD = "3.80.175.207"
     }
 
     stages {
@@ -78,9 +80,6 @@ pipeline {
             when {
                 expression { GIT_BRANCH == 'origin/master' }
             }
-            environment {
-                HOSTNAME_DEPLOY_STAGING = "34.230.0.167"
-            }
             steps {
                 sshagent(credentials : ['SSH_AUTH_SERVER']) {
                     sh '''
@@ -100,21 +99,22 @@ pipeline {
                 }
             }
         }
-       stage('Test staging') {
-           agent any
-           steps {
-              script {
-                    sh 'curl http://34.230.0.167:${PORT_EXPOSED} | grep -q "Hello world!"'
-              }
-           }
-       }
+
+        stage ('Test staging') {
+            agent any
+            steps {
+                script {
+                    sh '''
+                        curl ${HOSTNAME_DEPLOY_STAGING} | grep -q "Hello world!"
+                    '''
+                }
+            }
+        }
+
         stage ('Deploy in prod') {
             agent any
             when {
                 expression { GIT_BRANCH == 'origin/master' }
-            }
-            environment {
-                HOSTNAME_DEPLOY_PROD = "3.80.175.207"
             }
             steps {
                 sshagent(credentials : ['SSH_AUTH_SERVER']) {
@@ -134,15 +134,18 @@ pipeline {
                     '''
                 }
             }
-       stage('Test production') {
-           agent any
-           steps {
-              script {
-                    sh 'curl http://3.80.175.207:${PORT_EXPOSED} | grep -q "Hello world!"'
-              }
-           }
+        }
+
+        stage ('Test prod') {
+            agent any
+            steps {
+                script {
+                    sh '''
+                        curl ${HOSTNAME_DEPLOY_PROD} | grep -q "Hello world!"
+                    '''
+                }
+            }
         }
 
     }
-}
 }
